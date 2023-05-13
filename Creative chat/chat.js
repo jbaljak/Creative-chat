@@ -65,9 +65,9 @@ loginForm.addEventListener('submit', function(event) {
  }
 
  document.getElementById('open-react-app').addEventListener('click', function() {
-  // Render the React app to the container element
+  
   ReactDOM.render(
-    React.createElement(App), // Assuming your React app component is named App
+    React.createElement(App), 
     document.getElementById('root')
   );
 });
