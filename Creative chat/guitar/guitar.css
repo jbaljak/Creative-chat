@@ -1,0 +1,29 @@
+body {
+    background-color: black;
+  
+}
+button {
+
+    padding: 10px;
+    border: none;
+    margin-bottom: 20px;
+    background-color: #ffffff74;
+    color: #fff;
+    margin: 1%;
+    transition: background-color, transform 3s ease;
+    width: 98%;
+    height: 10px;
+  }
+
+  button:hover {
+    background-color: #009a8d;
+    transform: rotate(3deg);
+  }
+
+  h2 {
+    color: #fff;
+    text-align: center;
+    margin: 50px;
+    font-family: 'Bungee Shade', cursive;
+    font-size: 50px;
+  }

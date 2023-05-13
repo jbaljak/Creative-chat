@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Multiplayer Drawing App</title>
+    <link rel="stylesheet" href="draw.css">
+  </head>
+  <body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <button id="downloadBtn">Download Image</button>
+    <a href="chat.html">
+      <button>Go back</button>
+    </a>
+    <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const drone = new Scaledrone("gaosrKxqQhPW1mSe");
+      const roomName = "drawing-room2";
+
+      // Custom PNG files
+      const customImages = [
+        "1.png",
+        "2.png",
+        "3.png",
+        "4.png",
+        "5.png",
+        "6.png"
+      ];
+
+      function handleCanvasClick(event) {
+        const { offsetX, offsetY } = event;
+        drawRandomImage(offsetX, offsetY);
+
+        drone.publish({
+          room: roomName,
+          message: {
+            type: "draw",
+            x: offsetX,
+            y: offsetY,
+            color: "#FFF", 
+          },
+        });
+      }
+
+      function handleData(message) {
+        if (message.type === "draw") {
+          const { x, y, color } = message;
+          drawRandomImage(x, y);
+        }
+      }
+
+      function drawRandomImage(x, y) {
+        const imageIndex = Math.floor(Math.random() * customImages.length);
+        const image = new Image();
+        image.src = customImages[imageIndex];
+        image.onload = () => {
+          const minDotSize = 10; 
+          const maxDotSize = 200; 
+          const dotSize = Math.random() * (maxDotSize - minDotSize) + minDotSize;
+          const angle = Math.random() * Math.PI * 2; 
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(angle);
+          ctx.drawImage(image, -dotSize / 2, -dotSize / 2, dotSize, dotSize);
+          ctx.restore();
+        };
+      }
+
+      drone.on("open", () => {
+        console.log("Connected to Scaledrone");
+        const room = drone.subscribe(roomName);
+        room.on("data", handleData);
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        canvas.addEventListener("click", handleCanvasClick);
+      });
+
+      // Download image
+      const downloadBtn = document.getElementById("downloadBtn");
+      downloadBtn.addEventListener("click", () => {
+        const dataURL = canvas.toDataURL();
+        const link = document.createElement("a");
+        link.href = dataURL;
+        link.download = "drawing.png";
+        link.click();
+      });
+    </script>
+  </body>
+</html>

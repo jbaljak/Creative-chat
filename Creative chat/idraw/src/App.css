@@ -1,0 +1,40 @@
+body {
+  background-color: #000000;
+}
+
+canvas {
+  display: block;
+  margin: 0 auto;
+  border: 2px solid #333;
+  background-color: #ffffff;
+  cursor: crosshair;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+button, label {
+  display: flex;
+  margin: 20px;
+  padding: 10px 20px;
+  background-color: #ffffff;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 150px;
+  transition: background-color 0.3s ease;
+}
+
+button, label {
+  background-color: #9997973f;
+}
+
+button:hover, label:hover {
+  background-color: #004a94ba;
+}

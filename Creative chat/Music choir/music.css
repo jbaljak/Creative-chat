@@ -1,0 +1,37 @@
+  /* Update body background color */
+  body {
+    background-color: black;
+  }
+
+  /* Update button styles */
+  button {
+    padding: 10px;
+    border: none;
+    border-radius: 50px;
+    margin-bottom: 20px;
+    background-color: #ffffff99;
+    color: #fff;
+    margin: 1%;
+    transition: background-color, transform 8s ease;
+    width: 96%;
+    height: 10px;
+    transform: rotate(-5deg);
+   
+    
+  }
+
+  button:hover {
+    background-color: #047c0089;
+    transform: rotate(5deg);
+    
+    
+  }
+
+
+  h2 {
+    color: #fff;
+    text-align: center;
+    margin: 50px;
+    font-family: 'Bungee Shade', cursive;
+    font-size: 50px;
+  }

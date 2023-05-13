@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Multiplayer Drawing App</title>
+    <link rel="stylesheet" href="draw.css">
+  </head>
+  <body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <button id="downloadBtn">Download Image</button>
+    <a href="chat.html">
+      <button>Go back</button>
+    </a>
+    <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const drone = new Scaledrone("gaosrKxqQhPW1mSe");
+      const roomName = "drawing-room9";
+
+      function handleCanvasClick(event) {
+        const { offsetX, offsetY } = event;
+        drawRandomGroup(offsetX, offsetY);
+
+        drone.publish({
+          room: roomName,
+          message: {
+            type: "draw",
+            x: offsetX,
+            y: offsetY,
+            color: "#FFF", 
+          },
+        });
+      }
+
+      function handleData(message) {
+        if (message.type === "draw") {
+          const { x, y, color } = message;
+          drawRandomGroup(x, y);
+        }
+      }
+
+      function drawRandomGroup(x, y) {
+        const groupCount = Math.floor(Math.random() * 5) + 1; 
+
+        for (let i = 0; i < groupCount; i++) {
+          const groupSize = Math.floor(Math.random() * 5) + 1; 
+
+          for (let j = 0; j < groupSize; j++) {
+            const offsetX = Math.random() * 30 - 15; 
+            const offsetY = Math.random() * 30 - 15; 
+
+            const startX = x + offsetX;
+            const startY = y + offsetY;
+            const endX = Math.random() * canvas.width;
+            const endY = Math.random() * canvas.height;
+
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, endY);
+            ctx.strokeStyle = "#FFF"; 
+            ctx.stroke();
+
+            const dotX = Math.random() * canvas.width;
+            const dotY = Math.random() * canvas.height;
+            const minDotSize = 3; 
+            const maxDotSize = 15; 
+            const dotSize = Math.random() * (maxDotSize - minDotSize) + minDotSize;
+
+            ctx.beginPath();
+            ctx.arc(dotX, dotY, dotSize, 0, Math.PI * 2);
+            ctx.fillStyle = "#FFF"; 
+            ctx.fill();
+          }
+        }
+      }
+
+      drone.on("open", () => {
+        console.log("Connected to Scaledrone");
+        const room = drone.subscribe(roomName);
+        room.on("data", handleData);
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        canvas.addEventListener("click", handleCanvasClick);
+      });
+
+      // Download image
+      const downloadBtn = document.getElementById("downloadBtn");
+      downloadBtn.addEventListener("click", () => {
+        const dataURL = canvas.toDataURL();
+        const link = document.createElement("a");
+        link.href = dataURL;
+        link.download = "drawing.png";
+        link.click();
+      });
+    </script>
+  </body>
+</html>

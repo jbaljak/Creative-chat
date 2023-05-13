@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Multiplayer Drawing App</title>
+    <link rel="stylesheet" href="draw.css">
+  </head>
+  <body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <button id="downloadBtn">Download Image</button>
+    <a href="chat.html">
+      <button>Go back</button>
+    </a>
+    <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const drone = new Scaledrone("gaosrKxqQhPW1mSe");
+      const roomName = "drawing-room14";
+
+      function handleCanvasClick(event) {
+        const { offsetX, offsetY } = event;
+        drawShape(offsetX, offsetY);
+
+        drone.publish({
+          room: roomName,
+          message: {
+            type: "draw",
+            x: offsetX,
+            y: offsetY,
+          },
+        });
+      }
+
+      function handleData(message) {
+        if (message.type === "draw") {
+          const { x, y } = message;
+          drawShape(x, y);
+        }
+      }
+
+      function drawShape(x, y) {
+        const shapeTypes = ["dot", "square", "circle"];
+        const randomShapeType = shapeTypes[Math.floor(Math.random() * shapeTypes.length)];
+        const minSize = 5;
+        const maxSize = 30;
+        const size = Math.random() * (maxSize - minSize) + minSize;
+        const color = getRandomColor();
+
+        ctx.fillStyle = color;
+
+        if (randomShapeType === "dot") {
+          ctx.beginPath();
+          ctx.arc(x, y, size, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (randomShapeType === "square") {
+          ctx.fillRect(x - size / 2, y - size / 2, size, size);
+        } else if (randomShapeType === "circle") {
+          ctx.beginPath();
+          ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function getRandomColor() {
+        const letters = "0123456789ABCDEF";
+        let color = "#";
+        for (let i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+      }
+
+      drone.on("open", () => {
+        console.log("Connected to Scaledrone");
+        const room = drone.subscribe(roomName);
+        room.on("data", handleData);
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        canvas.addEventListener("click", handleCanvasClick);
+      });
+
+      // Download image
+      const downloadBtn = document.getElementById("downloadBtn");
+      downloadBtn.addEventListener("click", () => {
+        const dataURL = canvas.toDataURL();
+        const link = document.createElement("a");
+        link.href = dataURL;
+        link.download = "drawing.png";
+        link.click();
+      });
+    </script>
+  </body>
+</html>

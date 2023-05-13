@@ -1,0 +1,41 @@
+body {
+    background-color: #000000;
+  }
+  canvas {
+    display: block;
+    margin: 0 auto;
+    border: 2px solid #ffffff92;
+    background-color: #000000;
+    cursor: crosshair;
+  }
+
+  #downloadBtn {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  #downloadBtn:hover {
+    background-color: #829c19e0;
+  }
+
+  button{
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #829c19e0;
+  }

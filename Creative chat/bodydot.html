@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Multiplayer Drawing App</title>
+    <link rel="stylesheet" href="draw.css">
+  </head>
+  <body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <button id="downloadBtn">Download Image</button>
+    <a href="chat.html">
+      <button>Go back</button>
+    </a>
+
+    <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const drone = new Scaledrone("gaosrKxqQhPW1mSe");
+      const roomName = "drawing-room";
+
+      function handleCanvasClick(event) {
+        const { offsetX, offsetY } = event;
+        drawLine(offsetX, offsetY);
+
+        drone.publish({
+          room: roomName,
+          message: {
+            type: "draw",
+            x: offsetX,
+            y: offsetY,
+            color: "#FFF", 
+          },
+        });
+      }
+
+      function handleData(message) {
+        if (message.type === "draw") {
+          const { x, y, color } = message;
+          drawLine(x, y);
+        }
+      }
+
+      function drawLine(x, y) {
+        const lineWidth = Math.random() * 10 + 1;
+        const lineLength = Math.random() * 30 + 10;
+        const controlPointX = x + Math.random() * 100 - 50;
+        const controlPointY = y + Math.random() * 100 - 50;
+        const endX = x + Math.random() * 100 - 50;
+        const endY = y + Math.random() * 100 - 50;
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.quadraticCurveTo(controlPointX, controlPointY, endX, endY);
+        ctx.strokeStyle = `rgba(255, 255, 255, ${Math.random()})`;
+        ctx.lineWidth = lineWidth;
+        ctx.stroke();
+      }
+
+      drone.on("open", () => {
+        console.log("Connected to Scaledrone");
+        const room = drone.subscribe(roomName);
+        room.on("data", handleData);
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        canvas.addEventListener("click", handleCanvasClick);
+      });
+
+      // Download image
+      const downloadBtn = document.getElementById("downloadBtn");
+      downloadBtn.addEventListener("click", () => {
+        const dataURL = canvas.toDataURL();
+        const link = document.createElement("a");
+        link.href = dataURL;
+        link.download = "drawing.png";
+        link.click();
+      });
+    </script>
+  </body>
+</html>

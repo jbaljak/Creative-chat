@@ -1,0 +1,115 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #000000;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+h1 {
+  text-align: center;
+  margin: 20px;
+  font-family: 'Bungee Shade', cursive;
+  font-size: 100px;
+}
+
+h3 {
+  margin: 20px;
+  font-family: 'Bungee Shade', cursive;
+  font-size: 40px;
+}
+
+
+#login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px;
+}
+
+label {
+  margin-bottom: 10px;
+}
+
+input[type="text"],
+input[type="color"],
+button {
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  margin-bottom: 10px;
+  background-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+  margin: 10px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: rgba(255, 0, 102, 0.8);
+}
+
+input[type="text"]:focus,
+input[type="color"]:focus {
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.3);
+  margin: 10px;
+}
+
+button[type="submit"] {
+  background-color: #50c057da;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: #3c7a3eb0;
+}
+
+
+#welcome-message {
+  display: none;
+}
+
+#login-form:valid + #welcome-message {
+  display: block;
+}
+
+#messages {
+  height: 400px;
+  overflow-y: scroll;
+  margin: 10px;
+  background-color: rgba(255, 255, 255, 0.738);
+  border-radius: 5px;
+}
+
+.message {
+  padding: 10px;
+  background-color: rgba(215, 118, 203, 0.714);
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.message .username {
+  font-weight: bold;
+  color: #4CAF50;
+}
+
+.message .content {
+  margin-top: 5px;
+}
+
+#Drawing {
+  margin: 10px;
+}
+
+#Drawing h3 {
+  margin-bottom: 10px;
+}
+
+

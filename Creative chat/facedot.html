@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Multiplayer Drawing App</title>
+    <link rel="stylesheet" href="draw.css">
+  </head>
+  <body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <button id="downloadBtn">Download Image</button>
+    <a href="chat.html">
+      <button>Go back</button>
+    </a>
+    <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const drone = new Scaledrone("gaosrKxqQhPW1mSe");
+      const roomName = "drawing-room6";
+
+      function handleCanvasClick(event) {
+        const { offsetX, offsetY } = event;
+        drawFlower(offsetX, offsetY);
+
+        drone.publish({
+          room: roomName,
+          message: {
+            type: "draw",
+            x: offsetX,
+            y: offsetY,
+          },
+        });
+      }
+
+      function handleData(message) {
+        if (message.type === "draw") {
+          const { x, y } = message;
+          drawFlower(x, y);
+        }
+      }
+
+      function drawFlower(x, y) {
+        const petalCount = 6; 
+        const minPetalSize = 5; 
+        const maxPetalSize = 30; 
+        const flowerSize = Math.random() * (maxPetalSize - minPetalSize) + minPetalSize;
+        const transparency = Math.random() * 0.5 + 0.3; 
+        const color = getRandomColor(); 
+
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${transparency})`;
+
+        for (let i = 0; i < petalCount; i++) {
+          const angle = (i * 2 * Math.PI) / petalCount;
+          const petalSize = Math.random() * (maxPetalSize - minPetalSize) + minPetalSize;
+          const dx = Math.cos(angle) * flowerSize;
+          const dy = Math.sin(angle) * flowerSize;
+          const petalX = x + dx;
+          const petalY = y + dy;
+
+          ctx.moveTo(petalX, petalY);
+          ctx.arc(petalX, petalY, petalSize, 0, 2 * Math.PI);
+        }
+
+        ctx.fill();
+      }
+
+      function getRandomColor() {
+        const r = Math.floor(Math.random() * 256);
+        const g = Math.floor(Math.random() * 256);
+        const b = Math.floor(Math.random() * 256);
+        return { r, g, b };
+      }
+
+      drone.on("open", () => {
+        console.log("Connected to Scaledrone");
+        const room = drone.subscribe(roomName);
+        room.on("data", handleData);
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        canvas.addEventListener("click", handleCanvasClick);
+      });
+
+      // Download image
+      const downloadBtn = document.getElementById("downloadBtn");
+      downloadBtn.addEventListener("click", () => {
+        const dataURL = canvas.toDataURL();
+        const link = document.createElement("a");
+        link.href = dataURL;
+        link.download = "drawing.png";
+        link.click();
+      });
+    </script>
+  </body>
+</html>

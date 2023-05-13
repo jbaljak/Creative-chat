@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Multiplayer Instrument App</title>
+  <link rel="stylesheet" href="music.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&display=swap" rel="stylesheet">
+</head>
+<body>
+  <h2>MULTIPLAYER INSTRUMENT</h2>
+  <div id="instruments"></div>
+
+    <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
+  <script>
+    const channelID = 'gaosrKxqQhPW1mSe';
+const drone = new Scaledrone(channelID);
+const instrumentsDiv = document.getElementById('instruments');
+
+drone.on('open', error => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('Connected to Scaledrone');
+    const room = drone.subscribe('instrument-room');
+    room.on('message', message => {
+      console.log('Received message:', message);
+      playInstrument(message.data);
+    });
+  }
+});
+
+function playInstrument(instrument) {
+  const audio = new Audio(instrument.sound);
+  audio.play();
+}
+
+function createInstrumentButton(instrument) {
+  const button = document.createElement('button');
+  button.textContent = instrument.name;
+  button.addEventListener('click', () => {
+    drone.publish({
+      room: 'instrument-room',
+      message: instrument,
+    });
+    playInstrument(instrument);
+  });
+  instrumentsDiv.appendChild(button);
+}
+
+// Define your instruments
+const instruments = [
+  { name: '', sound: 'mixkit-angelic-drum-roll-573.wav' },
+  { name: '', sound: 'mixkit-big-woosh-heal-choir-661.wav' },
+  { name: '', sound: 'mixkit-choir-harp-bless-657.wav' },
+  { name: '', sound: 'mixkit-choir-magic-shine-658.wav' },
+  { name: '', sound: 'mixkit-cinematic-dark-choir-transition-664.wav' },
+  { name: '', sound: 'mixkit-huge-choir-echo-swell-659.wav' },
+  { name: '', sound: 'mixkit-horror-choir-transition-660.wav' },
+  { name: '', sound: 'mixkit-flute-music-notification-2311.wav' },
+  { name: '', sound: 'mixkit-mythical-violin-jingle-2281.wav' },
+  { name: '', sound: 'mixkit-orchestral-violin-treble-note-2279.wav' },
+];
+
+// Create buttons for each instrument
+instruments.forEach(instrument => {
+  createInstrumentButton(instrument);
+});
+
+  </script>
+</body>
+</html>

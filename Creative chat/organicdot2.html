@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Multiplayer Drawing App</title>
+    <link rel="stylesheet" href="draw.css">
+  </head>
+  <body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <button id="downloadBtn">Download Image</button>
+    <a href="chat.html">
+      <button>Go back</button>
+    </a>
+    <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const drone = new Scaledrone("gaosrKxqQhPW1mSe");
+      const roomName = "drawing-room12";
+
+      function handleCanvasClick(event) {
+        const { offsetX, offsetY } = event;
+        drawOrganicShape(offsetX, offsetY);
+
+        drone.publish({
+          room: roomName,
+          message: {
+            type: "draw",
+            x: offsetX,
+            y: offsetY,
+            color: "#FFF", 
+          },
+        });
+      }
+
+      function handleData(message) {
+        if (message.type === "draw") {
+          const { x, y, color } = message;
+          drawOrganicShape(x, y);
+        }
+      }
+
+      function drawOrganicShape(x, y) {
+        const minShapeSize = 30; 
+        const maxShapeSize = 200; 
+        const shapeSize = Math.random() * (maxShapeSize - minShapeSize) + minShapeSize;
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+
+        for (let i = 0; i < 5; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const radius = shapeSize * Math.random();
+          const newX = x + Math.cos(angle) * radius;
+          const newY = y + Math.sin(angle) * radius;
+          ctx.lineTo(newX, newY);
+        }
+
+        ctx.closePath();
+
+        const transparency = Math.random() * 0.5 + 0.1; 
+        const color = `rgba(255, 255, 255, ${transparency})`; 
+        ctx.fillStyle = color;
+        ctx.fill();
+      }
+
+      drone.on("open", () => {
+        console.log("Connected to Scaledrone");
+        const room = drone.subscribe(roomName);
+        room.on("data", handleData);
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        canvas.addEventListener("click", handleCanvasClick);
+      });
+
+      // Download image
+      const downloadBtn = document.getElementById("downloadBtn");
+      downloadBtn.addEventListener("click", () => {
+        const dataURL = canvas.toDataURL();
+        const link = document.createElement("a");
+        link.href = dataURL;
+        link.download = "drawing.png";
+        link.click();
+      });
+    </script>
+  </body>
+</html>

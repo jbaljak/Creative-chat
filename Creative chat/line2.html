@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Multiplayer Drawing App</title>
+    <link rel="stylesheet" href="drawwhite.css">
+  </head>
+  <body>
+    <canvas id="canvas" width="800px" height="600px"></canvas>
+    <br>
+    <button id="downloadBtn">Download Image</button>
+    <a href="chat.html">
+      <button>Go back</button>
+    </a>
+    <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const drone = new Scaledrone("gaosrKxqQhPW1mSe");
+      const roomName = "drawing-room7";
+      let isDrawing = false;
+      let startX = 0;
+      let startY = 0;
+
+      function handleMouseDown(event) {
+        const { offsetX, offsetY } = event;
+        isDrawing = true;
+        startX = offsetX;
+        startY = offsetY;
+      }
+
+      function handleMouseUp(event) {
+        if (!isDrawing) return;
+        const { offsetX, offsetY } = event;
+        isDrawing = false;
+        drawLine(startX, startY, offsetX, offsetY);
+        drone.publish({
+          room: roomName,
+          message: {
+            type: "draw",
+            startX,
+            startY,
+            endX: offsetX,
+            endY: offsetY,
+            color: "#000",
+          },
+        });
+      }
+
+      function handleData(message) {
+        if (message.type === "draw") {
+          const { startX, startY, endX, endY } = message;
+          drawLine(startX, startY, endX, endY);
+        }
+      }
+
+      function drawLine(startX, startY, endX, endY) {
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+      }
+
+      drone.on("open", () => {
+        console.log("Connected to Scaledrone");
+        const room = drone.subscribe(roomName);
+        room.on("data", handleData);
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        canvas.addEventListener("mousedown", handleMouseDown);
+        canvas.addEventListener("mouseup", handleMouseUp);
+      });
+
+      // Download image
+      const downloadBtn = document.getElementById("downloadBtn");
+      downloadBtn.addEventListener("click", () => {
+        const dataURL = canvas.toDataURL();
+        const link = document.createElement("a");
+        link.href = dataURL;
+        link.download = "drawing.png";
+        link.click();
+      });
+    </script>
+  </body>
+</html>
+
